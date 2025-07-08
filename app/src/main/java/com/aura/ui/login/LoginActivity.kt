@@ -2,7 +2,6 @@ package com.aura.ui.login
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -29,6 +28,10 @@ class LoginActivity : AppCompatActivity()
    */
   private val loginViewModel: LoginViewModel by viewModels()
 
+  /**
+   * Called when the activity is created.
+   * @param savedInstanceState The saved instance state.
+   */
   override fun onCreate(savedInstanceState: Bundle?)
   {
     super.onCreate(savedInstanceState)
@@ -41,6 +44,9 @@ class LoginActivity : AppCompatActivity()
     setupLoginButton()
   }
 
+  /**
+   * Sets up the input listeners.
+   */
   private fun setupInputListeners() {
     binding.identifier.doOnTextChanged { text, _, _, _ ->
       loginViewModel.setEmail(text.toString())
@@ -51,17 +57,22 @@ class LoginActivity : AppCompatActivity()
     }
   }
 
+  /**
+   * Observes the view model.
+   */
   private fun observeViewModel() {
     lifecycleScope.launch {
       repeatOnLifecycle(Lifecycle.State.STARTED) {
         loginViewModel.isLoginFormValid.collect { isEnabled ->
           binding.login.isEnabled = isEnabled
-          binding.login.visibility = if (isEnabled) View.VISIBLE else View.INVISIBLE
         }
       }
     }
   }
 
+  /**
+   * Sets up the login button.
+   */
   private fun setupLoginButton() {
     binding.login.setOnClickListener {
 
@@ -71,6 +82,9 @@ class LoginActivity : AppCompatActivity()
     }
   }
 
+  /**
+   * Navigates to the home activity.
+   */
   private fun navigateToHome() {
     val intent = Intent(this@LoginActivity, HomeActivity::class.java)
     startActivity(intent)
