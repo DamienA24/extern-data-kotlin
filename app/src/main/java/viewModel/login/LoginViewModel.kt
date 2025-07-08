@@ -1,4 +1,4 @@
-package viewModel.login
+package viewModel.viewModel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.stateIn
  */
 class LoginViewModel: ViewModel() {
 
-    private val email = MutableStateFlow("")
-    private val password = MutableStateFlow("")
+    private val _email = MutableStateFlow("")
+    private val _password = MutableStateFlow("")
 
     /**
      * The email of the user.
      * @param newEmail The new email of the user.
      */
     fun setEmail(newEmail: String) {
-        email.value = newEmail
+        _email.value = newEmail
     }
 
     /**
@@ -29,15 +29,15 @@ class LoginViewModel: ViewModel() {
      * @param newPassword The new password of the user.
      */
     fun setPassword(newPassword: String) {
-        password.value = newPassword
+        _password.value = newPassword
     }
 
     /**
      * The login form is valid.
      */
     val isLoginFormValid : StateFlow<Boolean> =
-        combine(email, password) { email, password ->
-        email.isNotBlank() && password.isNotBlank()
+        combine(_email, _password) { email, password ->
+            email.isNotBlank() && password.isNotBlank()
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
