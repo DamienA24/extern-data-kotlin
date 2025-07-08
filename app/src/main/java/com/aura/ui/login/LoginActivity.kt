@@ -11,7 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.aura.databinding.ActivityLoginBinding
 import com.aura.ui.home.HomeActivity
 import kotlinx.coroutines.launch
-import viewModel.login.LoginViewModel
+import viewModel.viewModel.LoginViewModel
 
 /**
  * The login activity for the app.
