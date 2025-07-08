@@ -2,6 +2,7 @@ package com.aura.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -10,12 +11,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.aura.databinding.ActivityLoginBinding
 import com.aura.ui.home.HomeActivity
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import viewModel.viewModel.LoginViewModel
 
 /**
  * The login activity for the app.
  */
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity()
 {
 
@@ -61,10 +64,28 @@ class LoginActivity : AppCompatActivity()
    * Observes the view model.
    */
   private fun observeViewModel() {
+    Log.d("LoginActivity", "observeViewModel: Starting observation")
     lifecycleScope.launch {
+      Log.d("LoginActivity", "observeViewModel: lifecycleScope.launch entered")
       repeatOnLifecycle(Lifecycle.State.STARTED) {
-        loginViewModel.isLoginFormValid.collect { isEnabled ->
-          binding.login.isEnabled = isEnabled
+        Log.d("LoginActivity", "observeViewModel: repeatOnLifecycle - STARTED")
+        launch {
+          loginViewModel.isLoginFormValid.collect { isEnabled ->
+            binding.login.isEnabled = isEnabled
+          }
+
+          launch {
+            Log.d("LoginActivity", "observeViewModel: Starting to collect loginState")
+            loginViewModel.loginState.collect { state ->
+              Log.i("LoginActivity", "Login $state")
+              if (state.granted) {
+                Log.d("LoginActivity", "State is granted, navigating to home...")
+                navigateToHome()
+              } else {
+                Log.d("LoginActivity", "State is NOT granted.")
+              }
+            }
+          }
         }
       }
     }
@@ -77,7 +98,7 @@ class LoginActivity : AppCompatActivity()
     binding.login.setOnClickListener {
 
       if (binding.login.isEnabled) {
-        navigateToHome()
+        loginViewModel.loginUser()
       }
     }
   }
