@@ -2,6 +2,7 @@ plugins {
   id("com.android.application")
   id("org.jetbrains.kotlin.android")
   id("org.jetbrains.kotlin.kapt")
+  id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -93,7 +94,21 @@ dependencies {
   implementation("com.squareup.moshi:moshi-kotlin:1.15.2")
   implementation("com.squareup.retrofit2:converter-moshi:2.9.0")
 
-  implementation("com.squareup.retrofit2:retrofit:3.1.0-SNAPSHOT")
+  implementation("com.squareup.retrofit2:retrofit:3.0.0")
   implementation("com.squareup.okhttp3:okhttp:4.12.0")
   implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+  implementation("com.google.dagger:hilt-android:2.56.2")
+  kapt("com.google.dagger:hilt-compiler:2.56.2")
+
+  androidTestImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+  kaptAndroidTest("com.google.dagger:hilt-compiler:2.56.2")
+
+  // For local unit tests
+  testImplementation("com.google.dagger:hilt-android-testing:2.56.2")
+  kaptTest("com.google.dagger:hilt-compiler:2.56.2")
+}
+
+kapt {
+  correctErrorTypes = true
 }
