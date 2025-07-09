@@ -54,7 +54,7 @@ class LoginActivity : AppCompatActivity()
    */
   private fun setupInputListeners() {
     binding.identifier.doOnTextChanged { text, _, _, _ ->
-      loginViewModel.setEmail(text.toString())
+      loginViewModel.setId(text.toString())
     }
 
     binding.password.doOnTextChanged { text, _, _, _ ->
@@ -89,7 +89,8 @@ class LoginActivity : AppCompatActivity()
               }
               is LoginUiState.Success -> {
                 binding.progressBar.visibility = View.GONE
-                navigateToHome()
+                val userId = loginViewModel.userId.value
+                navigateToHome(userId)
               }
               is LoginUiState.Error -> {
                 binding.progressBar.visibility = View.GONE
@@ -120,8 +121,11 @@ class LoginActivity : AppCompatActivity()
   /**
    * Navigates to the home activity.
    */
-  private fun navigateToHome() {
-    val intent = Intent(this@LoginActivity, HomeActivity::class.java)
+  private fun navigateToHome(userId: String) {
+    Log.d("userId", userId)
+    val intent = Intent(this@LoginActivity, HomeActivity::class.java).apply {
+      putExtra("USER_ID_EXTRA", userId)
+    }
     startActivity(intent)
     finish()
   }

@@ -29,16 +29,17 @@ class LoginViewModel @Inject constructor(
 
     private val _id = MutableStateFlow("")
     private val _password = MutableStateFlow("")
+    val userId: StateFlow<String> = _id.asStateFlow()
 
     private val _loginUiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
     val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
 
     /**
      * The email of the user.
-     * @param newEmail The new email of the user.
+     * @param newId The new email of the user.
      */
-    fun setEmail(newEmail: String) {
-        _id.value = newEmail
+    fun setId(newId: String) {
+        _id.value = newId
     }
 
     /**
