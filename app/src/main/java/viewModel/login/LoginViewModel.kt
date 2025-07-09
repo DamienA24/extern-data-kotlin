@@ -76,13 +76,9 @@ class LoginViewModel @Inject constructor(
                 // Log.e("LoginViewModel", "Exception from repo flow", exception)
                 // }
                 .collect { state ->
-                    Log.d("LoginViewModel", "Current _loginState.value BEFORE update: ${_loginState.value}")
-                    Log.d("LoginViewModel", "Value from repository to be set: $state")
                     _loginState.value = state
-                    Log.d("LoginViewModel", "Current _loginState.value AFTER update: ${_loginState.value}")
                     if (state == LoginResponse(true)) {
                         Log.i("LoginViewModel", "Login success")
-
                     } else if (state == LoginResponse(false)) {
                         Log.i("LoginViewModel", "Login false")
                     }

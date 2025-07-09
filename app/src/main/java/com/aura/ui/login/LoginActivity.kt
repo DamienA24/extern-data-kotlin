@@ -64,26 +64,18 @@ class LoginActivity : AppCompatActivity()
    * Observes the view model.
    */
   private fun observeViewModel() {
-    Log.d("LoginActivity", "observeViewModel: Starting observation")
     lifecycleScope.launch {
-      Log.d("LoginActivity", "observeViewModel: lifecycleScope.launch entered")
       repeatOnLifecycle(Lifecycle.State.STARTED) {
-        Log.d("LoginActivity", "observeViewModel: repeatOnLifecycle - STARTED")
         launch {
           loginViewModel.isLoginFormValid.collect { isEnabled ->
             binding.login.isEnabled = isEnabled
           }
-
-          launch {
-            Log.d("LoginActivity", "observeViewModel: Starting to collect loginState")
-            loginViewModel.loginState.collect { state ->
-              Log.i("LoginActivity", "Login $state")
-              if (state.granted) {
-                Log.d("LoginActivity", "State is granted, navigating to home...")
-                navigateToHome()
-              } else {
-                Log.d("LoginActivity", "State is NOT granted.")
-              }
+        }
+        launch {
+          loginViewModel.loginState.collect { state ->
+            if (state.granted) {
+              navigateToHome()
+            } else {
             }
           }
         }
