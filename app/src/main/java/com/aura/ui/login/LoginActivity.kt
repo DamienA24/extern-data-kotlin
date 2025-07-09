@@ -3,6 +3,8 @@ package com.aura.ui.login
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doOnTextChanged
@@ -72,10 +74,30 @@ class LoginActivity : AppCompatActivity()
           }
         }
         launch {
-          loginViewModel.loginState.collect { state ->
-            if (state.granted) {
-              navigateToHome()
-            } else {
+          loginViewModel.loginUiState.collect { state ->
+            Log.d("state", state.toString())
+            when (state) {
+              is LoginUiState.Idle -> {
+                binding.progressBar.visibility = View.GONE
+                binding.login.isEnabled = loginViewModel.isLoginFormValid.value
+              }
+              is LoginUiState.Loading -> {
+                binding.progressBar.visibility = View.VISIBLE
+                binding.login.isEnabled = false
+                binding.identifier.isEnabled = false
+                binding.password.isEnabled = false
+              }
+              is LoginUiState.Success -> {
+                binding.progressBar.visibility = View.GONE
+                navigateToHome()
+              }
+              is LoginUiState.Error -> {
+                binding.progressBar.visibility = View.GONE
+                binding.login.isEnabled = loginViewModel.isLoginFormValid.value
+                binding.identifier.isEnabled = true
+                binding.password.isEnabled = true
+                Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_LONG).show()
+              }
             }
           }
         }

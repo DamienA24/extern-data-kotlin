@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.activity.result.launch
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aura.ui.login.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.api.ApiService
 import data.model.LoginRequest
@@ -29,8 +30,8 @@ class LoginViewModel @Inject constructor(
     private val _id = MutableStateFlow("")
     private val _password = MutableStateFlow("")
 
-    private val _loginState = MutableStateFlow<LoginResponse>(LoginResponse(false))
-    val loginState: StateFlow<LoginResponse> = _loginState.asStateFlow()
+    private val _loginUiState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
+    val loginUiState: StateFlow<LoginUiState> = _loginUiState.asStateFlow()
 
     /**
      * The email of the user.
@@ -62,27 +63,30 @@ class LoginViewModel @Inject constructor(
 
     fun loginUser() {
         if (!isLoginFormValid.value) {
-            _loginState.value = LoginResponse(false)
+            _loginUiState.value = LoginUiState.Error(LoginResponse(false))
             return
         }
+
+        _loginUiState.value = LoginUiState.Loading
 
         viewModelScope.launch {
             val request = LoginRequest(id = _id.value, password = _password.value)
 
-            authRepository.loginUser(request)
-                // Optionnel : Si vous voulez intercepter une erreur qui n'aurait pas été transformée en SimpleLoginState.Error par le repo
-                // .catch { exception ->
-                // _loginState.value = SimpleLoginState.Error("Erreur VM: ${exception.message}")
-                // Log.e("LoginViewModel", "Exception from repo flow", exception)
-                // }
-                .collect { state ->
-                    _loginState.value = state
-                    if (state == LoginResponse(true)) {
-                        Log.i("LoginViewModel", "Login success")
-                    } else if (state == LoginResponse(false)) {
-                        Log.i("LoginViewModel", "Login false")
+            try {
+                authRepository.loginUser(request)
+                    .collect { state ->
+                        if (state == LoginResponse(true)) {
+                            _loginUiState.value = LoginUiState.Success(LoginResponse(true))
+                            Log.i("LoginViewModel", "Login true: $state")
+                        } else {
+                            _loginUiState.value = LoginUiState.Error(LoginResponse(false))
+                            Log.i("LoginViewModel", "Login false: $state")
+                        }
                     }
-                }
+            } catch (e: Exception) {
+                _loginUiState.value = LoginUiState.Error(LoginResponse(false))
+            }
+
         }
     }
 }
