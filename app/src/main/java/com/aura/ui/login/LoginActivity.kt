@@ -15,7 +15,7 @@ import com.aura.databinding.ActivityLoginBinding
 import com.aura.ui.home.HomeActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import viewModel.viewModel.LoginViewModel
+import viewModel.login.LoginViewModel
 
 /**
  * The login activity for the app.

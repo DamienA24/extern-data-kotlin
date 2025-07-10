@@ -1,4 +1,4 @@
-package viewModel.viewModel
+package viewModel.login
 
 import android.util.Log
 import androidx.activity.result.launch
@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import com.aura.ui.login.LoginUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.api.ApiService
-import data.model.LoginRequest
-import data.model.LoginResponse
+import data.model.login.LoginRequest
+import data.model.login.LoginResponse
 import data.repository.AuthRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow

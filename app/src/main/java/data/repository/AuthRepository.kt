@@ -1,9 +1,9 @@
 package data.repository
 
 import android.util.Log
-import data.model.LoginRequest
+import data.model.login.LoginRequest
 import data.api.ApiService
-import data.model.LoginResponse
+import data.model.login.LoginResponse
 import data.repository.service.AuthApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

@@ -1,6 +1,6 @@
 package com.aura.ui.login
 
-import data.model.LoginResponse
+import data.model.login.LoginResponse
 
 sealed class LoginUiState {
     object Idle : LoginUiState()
