@@ -93,11 +93,12 @@ class LoginActivity : AppCompatActivity()
                 navigateToHome(userId)
               }
               is LoginUiState.Error -> {
+                Log.d("error", state.message)
                 binding.progressBar.visibility = View.GONE
                 binding.login.isEnabled = loginViewModel.isLoginFormValid.value
                 binding.identifier.isEnabled = true
                 binding.password.isEnabled = true
-                Toast.makeText(this@LoginActivity, "Login failed", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@LoginActivity, state.message, Toast.LENGTH_LONG).show()
               }
             }
           }

@@ -1,5 +1,6 @@
 package data.repository
 
+import android.util.Log
 import data.model.LoginRequest
 import data.api.ApiService
 import data.model.LoginResponse
@@ -19,12 +20,8 @@ class AuthRepository @Inject constructor(
 ) : AuthApi {
 
     override suspend fun loginUser(loginRequest: LoginRequest): Flow<LoginResponse> = flow {
-        // 1. Émettre l'état de chargement
-        //emit(SimpleLoginState.Loading)
-
-
         val response = authApiService.login(loginRequest)
-
+        Log.d("response", response.toString())
         if (response.isSuccessful) {
             val apiResponse = response.body()
             if (apiResponse != null) {
@@ -40,16 +37,13 @@ class AuthRepository @Inject constructor(
         } else {
             //
             val errorBody = response.errorBody()?.string()
-            val errorMessage = "Erreur ${response.code()}: ${response.message()}" +
+            val errorMessage = "Error ${response.code()}: ${response.message()}" +
                     if (!errorBody.isNullOrBlank()) " - $errorBody" else ""
             emit(LoginResponse(false))
         }
     }.catch { e -> //
-        /*if (e is IOException) {
-            emit(SimpleLoginState.Error("Erreur réseau: ${e.message}"))
-        } else {
-            emit(SimpleLoginState.Error("Une erreur inattendue est survenue: ${e.message}"))
-        }*/
+        Log.e("AuthRepository", "Exception occurred in loginUser flow: ${e.message}", e)
+        throw e
     }.flowOn(Dispatchers.IO)
 }
 

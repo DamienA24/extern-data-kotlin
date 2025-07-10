@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+import java.io.IOException
+
 /**
  * The view model for the login activity.
  */
@@ -64,7 +66,7 @@ class LoginViewModel @Inject constructor(
 
     fun loginUser() {
         if (!isLoginFormValid.value) {
-            _loginUiState.value = LoginUiState.Error(LoginResponse(false))
+            _loginUiState.value = LoginUiState.Error("Please fill in the username and password.")
             return
         }
 
@@ -72,21 +74,25 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
             val request = LoginRequest(id = _id.value, password = _password.value)
-
             try {
                 authRepository.loginUser(request)
                     .collect { state ->
+                        Log.i("LoginViewModel", "Login state: $state")
                         if (state == LoginResponse(true)) {
                             _loginUiState.value = LoginUiState.Success(LoginResponse(true))
                             Log.i("LoginViewModel", "Login true: $state")
                         } else {
-                            _loginUiState.value = LoginUiState.Error(LoginResponse(false))
+                            _loginUiState.value = LoginUiState.Error("Incorrect login or password.")
                             Log.i("LoginViewModel", "Login false: $state")
                         }
                     }
-            } catch (e: Exception) {
-                _loginUiState.value = LoginUiState.Error(LoginResponse(false))
+            } catch (e: IOException) {
+                Log.e("LoginViewModel IOException", "Network error: ${e.message}")
+                _loginUiState.value = LoginUiState.Error("Connection error. Check your internet connection.")
             }
+            catch (e: Exception) {
+                Log.e("LoginViewModel Exception", "Unexpected error: ${e.message}")
+                _loginUiState.value = LoginUiState.Error("An unexpected error has occurred: ${e.message ?: "unknown"}")            }
 
         }
     }
