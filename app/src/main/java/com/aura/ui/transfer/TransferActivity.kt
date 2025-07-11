@@ -39,8 +39,6 @@ class TransferActivity : AppCompatActivity()
     binding = ActivityTransferBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    val recipient = binding.recipient
-    val amount = binding.amount
     val transfer = binding.transfer
     val loading = binding.loading
 
