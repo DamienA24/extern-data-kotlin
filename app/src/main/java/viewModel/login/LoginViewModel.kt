@@ -58,10 +58,11 @@ class LoginViewModel @Inject constructor(
      */
     val isLoginFormValid : StateFlow<Boolean> =
         combine(_id, _password) { id, password ->
-            id.isNotBlank() && password.isNotBlank()
+            val isValid = id.isNotBlank() && password.isNotBlank()
+            isValid
         }.stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = false
         )
 
@@ -77,22 +78,22 @@ class LoginViewModel @Inject constructor(
             val request = LoginRequest(id = _id.value, password = _password.value)
             try {
                 authApi.loginUser(request)
-                    .collect { state ->
-                        Log.i("LoginViewModel", "Login state: $state")
-                        if (state == LoginResponse(true)) {
+                    .collect { apiResponse ->
+                        //Log.i("LoginViewModel", "Login state: $state")
+                        if (apiResponse == LoginResponse(true)) {
                             _loginUiState.value = LoginUiState.Success(LoginResponse(true))
-                            Log.i("LoginViewModel", "Login true: $state")
+                            //Log.i("LoginViewModel", "Login true: $state")
                         } else {
                             _loginUiState.value = LoginUiState.Error("Incorrect login or password.")
-                            Log.i("LoginViewModel", "Login false: $state")
+                            //Log.i("LoginViewModel", "Login false: $state")
                         }
                     }
             } catch (e: IOException) {
-                Log.e("LoginViewModel IOException", "Network error: ${e.message}")
+                //Log.e("LoginViewModel IOException", "Network error: ${e.message}")
                 _loginUiState.value = LoginUiState.Error("Connection error. Check your internet connection.")
             }
             catch (e: Exception) {
-                Log.e("LoginViewModel Exception", "Unexpected error: ${e.message}")
+                //Log.e("LoginViewModel Exception", "Unexpected error: ${e.message}")
                 _loginUiState.value = LoginUiState.Error("An unexpected error has occurred: ${e.message ?: "unknown"}")            }
 
         }
