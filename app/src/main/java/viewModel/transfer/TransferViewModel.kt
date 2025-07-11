@@ -34,8 +34,6 @@ class TransferViewModel @Inject constructor(
 
     private val _amount = MutableStateFlow<Double>(0.0)
     private val _recipient= MutableStateFlow("")
-    val amount: StateFlow<Double> = _amount.asStateFlow()
-    val recipient: StateFlow<String> = _recipient.asStateFlow()
 
     private val _transferAmountUiState = MutableStateFlow<TransferUiState>(TransferUiState.Idle)
     val transferAmountUiState: StateFlow<TransferUiState> = _transferAmountUiState.asStateFlow()
