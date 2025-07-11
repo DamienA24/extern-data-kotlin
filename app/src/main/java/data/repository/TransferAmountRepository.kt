@@ -42,6 +42,7 @@ class TransferAmountRepository @Inject constructor(
             val errorBody = response.errorBody()?.string()
             val errorMessage = "Error ${response.code()}: ${response.message()}" +
                     if (!errorBody.isNullOrBlank()) " - $errorBody" else ""
+            Log.e(TAG, errorMessage)
             emit(TransferResponse(false))
         }
     }.catch { e -> //

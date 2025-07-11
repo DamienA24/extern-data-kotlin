@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.aura.ui.home.HomeUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.account.AccountUserResponse
-import data.repository.AccountUserRepository
+import data.repository.service.AccountUserApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val accountUserRepository: AccountUserRepository
+    private val accountUserApi: AccountUserApi
 ) : ViewModel()  {
 
     private companion object {
@@ -41,7 +41,7 @@ class HomeViewModel @Inject constructor(
         Log.d(TAG, "Setting HomeUiState to Loading for fetching account with userId: $userId")
         viewModelScope.launch {
             try {
-                accountUserRepository.getAccountUser(userId)
+                accountUserApi.getAccountUser(userId)
                     .collect { userAccountList ->
                         Log.i(TAG, "Account fetched successfully: $userAccountList")
                         val accountToShow = userAccountList.firstOrNull { it.main } ?: userAccountList.first()

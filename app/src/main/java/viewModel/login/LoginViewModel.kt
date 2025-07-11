@@ -10,6 +10,7 @@ import data.api.ApiService
 import data.model.login.LoginRequest
 import data.model.login.LoginResponse
 import data.repository.AuthRepository
+import data.repository.service.AuthApi
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +27,7 @@ import java.io.IOException
  */
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authApi: AuthApi
 ): ViewModel() {
 
     private val _id = MutableStateFlow("")
@@ -75,7 +76,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             val request = LoginRequest(id = _id.value, password = _password.value)
             try {
-                authRepository.loginUser(request)
+                authApi.loginUser(request)
                     .collect { state ->
                         Log.i("LoginViewModel", "Login state: $state")
                         if (state == LoginResponse(true)) {

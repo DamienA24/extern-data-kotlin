@@ -8,7 +8,7 @@ import com.aura.ui.transfer.TransferUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.transfer.TransferRequest
 import data.model.transfer.TransferResponse
-import data.repository.TransferAmountRepository
+import data.repository.service.TransferAmountApi
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,7 @@ import java.io.IOException
  */
 @HiltViewModel
 class TransferViewModel @Inject constructor(
-    private val transferAmountRepository: TransferAmountRepository
+    private val transferAmountApi: TransferAmountApi
 ): ViewModel() {
 
     private companion object {
@@ -77,7 +77,7 @@ class TransferViewModel @Inject constructor(
         viewModelScope.launch {
             val request = TransferRequest(sender = sender, recipient = _recipient.value, amount = _amount.value)
             try {
-                transferAmountRepository.transferAmount(request)
+                transferAmountApi.transferAmount(request)
                     .collect { state ->
                         Log.i(TAG, "Transfer state: $state")
                         if (state == TransferResponse(true)) {
