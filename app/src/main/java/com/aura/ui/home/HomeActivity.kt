@@ -1,5 +1,6 @@
 package com.aura.ui.home
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -39,6 +40,8 @@ class HomeActivity : AppCompatActivity()
     private const val TAG = "HomeActivity"
   }
 
+  private var currentUserId: String? = null
+
   private val homeViewModel: HomeViewModel by viewModels()
 
   /**
@@ -46,7 +49,12 @@ class HomeActivity : AppCompatActivity()
    */
   private val startTransferActivityForResult =
     registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
-      //TODO
+      Log.d(TAG, "startTransferActivityForResult: $result")
+      if (result.resultCode == Activity.RESULT_OK) {
+        homeViewModel.loadUserData(currentUserId)
+      } else if (result.resultCode == Activity.RESULT_CANCELED) {
+        Log.i(TAG, "TransferActivity was canceled or failed.")
+      }
     }
 
   override fun onCreate(savedInstanceState: Bundle?)
@@ -56,23 +64,25 @@ class HomeActivity : AppCompatActivity()
     binding = ActivityHomeBinding.inflate(layoutInflater)
     setContentView(binding.root)
 
-    val userId = intent.getStringExtra("USER_ID_EXTRA")
-    if(userId == null) {
+    currentUserId = intent.getStringExtra("USER_ID_EXTRA")
+    if(currentUserId == null) {
       Toast.makeText(this, "Error: User ID is null.", Toast.LENGTH_LONG).show()
       navigateToLogin()
       return
     }
 
-    homeViewModel.loadUserData(userId)
+    homeViewModel.loadUserData(currentUserId)
 
     val transfer = binding.transfer
     val retry = binding.retryButton
 
     transfer.setOnClickListener {
-      startTransferActivityForResult.launch(Intent(this@HomeActivity, TransferActivity::class.java))
+      startTransferActivityForResult.launch(Intent(this@HomeActivity, TransferActivity::class.java).apply {
+        putExtra("USER_ID_EXTRA", currentUserId)
+      })
     }
     retry.setOnClickListener {
-      homeViewModel.loadUserData(userId)
+      homeViewModel.loadUserData(currentUserId)
     }
 
     observeHomeUiState()

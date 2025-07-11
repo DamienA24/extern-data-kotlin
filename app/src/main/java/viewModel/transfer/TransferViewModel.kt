@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 
 import androidx.lifecycle.viewModelScope
-import com.aura.ui.login.LoginUiState
+import com.aura.ui.transfer.TransferUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import data.model.login.LoginRequest
-import data.model.login.LoginResponse
-import data.repository.AuthRepository
+import data.model.transfer.TransferRequest
+import data.model.transfer.TransferResponse
+import data.repository.TransferAmountRepository
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -24,12 +24,21 @@ import java.io.IOException
  * The view model for the login activity.
  */
 @HiltViewModel
-class TransferViewModel @Inject constructor(): ViewModel() {
+class TransferViewModel @Inject constructor(
+    private val transferAmountRepository: TransferAmountRepository
+): ViewModel() {
+
+    private companion object {
+        private const val TAG = "TransferViewModel"
+    }
 
     private val _amount = MutableStateFlow<Double>(0.0)
     private val _recipient= MutableStateFlow("")
     val amount: StateFlow<Double> = _amount.asStateFlow()
     val recipient: StateFlow<String> = _recipient.asStateFlow()
+
+    private val _transferAmountUiState = MutableStateFlow<TransferUiState>(TransferUiState.Idle)
+    val transferAmountUiState: StateFlow<TransferUiState> = _transferAmountUiState.asStateFlow()
 
     /**
      * The amount of the user.
@@ -58,4 +67,36 @@ class TransferViewModel @Inject constructor(): ViewModel() {
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = false
         )
+
+    fun transferAmount(sender: String) {
+        if (!isTransferFormValid.value) {
+            _transferAmountUiState.value = TransferUiState.Error("Please fill in the amount and recipient.")
+            return
+        }
+
+        _transferAmountUiState.value = TransferUiState.Loading
+
+        viewModelScope.launch {
+            val request = TransferRequest(sender = sender, recipient = _recipient.value, amount = _amount.value)
+            try {
+                transferAmountRepository.transferAmount(request)
+                    .collect { state ->
+                        Log.i(TAG, "Transfer state: $state")
+                        if (state == TransferResponse(true)) {
+                            _transferAmountUiState.value = TransferUiState.Success(TransferResponse(true))
+                            Log.i(TAG, "Transfer true: $state")
+                        } else {
+                            _transferAmountUiState.value = TransferUiState.Error("Incorrect recipient, amount or sender.")
+                            Log.i(TAG, "Transfer false: $state")
+                        }
+                    }
+            } catch (e: IOException) {
+                Log.e("$TAG IOException", "Network error: ${e.message}")
+                _transferAmountUiState.value = TransferUiState.Error("Connection error. Check your internet connection.")
+            }
+            catch (e: Exception) {
+                Log.e("$TAG Exception", "Unexpected error: ${e.message}")
+                _transferAmountUiState.value = TransferUiState.Error("An unexpected error has occurred: ${e.message ?: "unknown"}")            }
+        }
+    }
 }
